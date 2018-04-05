@@ -15,50 +15,48 @@ landsat_downloader
 
 A python package used for download landsat images from EarthExplorer
 
-
 * Free software: GNU General Public License v3
 * Documentation: https://landsat-downloader.readthedocs.io.
 
-
 Features:
 --------
-* Find scenes;
 
-.. code-block:: python
-from datetime import datetime, timedelta
+* Find scenes:
+	.. code-block:: python
+   
+		from datetime import datetime, timedelta
 
-from landsat_downloader.finder import *
+		from landsat_downloader.finder import *
 
-today = datetime.now()
-last_30 = datetime.now() - timedelta(days=30)
-pr_list = [(224, 68), (224, 69)]
+		today = datetime.now()
+		last_30 = datetime.now() - timedelta(days=30)
+		pr_list = [(224, 68), (224, 69)]
 
-scenes = LandsatFinder.search_scenes_metadata(
-	path_row_list=pr_list, 
-	start_date=last_30, 
-	end_date=today)
+		scenes = LandsatFinder.search_scenes_metadata(
+			path_row_list=pr_list, 
+			start_date=last_30, 
+			end_date=today)
 
+* Download scenes:
+	.. code-block:: python
+    
+		from datetime import datetime, timedelta
 
-* Download scenes;
+		from landsat_downloader.downloader import *
 
-.. code-block:: python
-from datetime import datetime, timedelta
+		scene = "LC82240692018037LGN00"
+		landsat.download_scenes(scenes_list=[scene], bands=[4, "BQA"])
 
-from landsat_downloader.downloader import *
+or
 
-scene = "LC82240692018037LGN00"
-landsat.download_scenes(scenes_list=[scene], bands=[4, "BQA"])
+    .. code-block:: python
+    
+		from datetime import datetime, timedelta
 
+		from landsat_downloader.downloader import *
 
-or 
-
-.. code-block:: python
-from datetime import datetime, timedelta
-
-from landsat_downloader.downloader import *
-
-scene = "LC08_L1GT_224069_20180206_20180221_01_T2"
-landsat.download_scenes(scenes_list=[scene],  bands=[4, "BQA"])
+		scene = "LC08_L1GT_224069_20180206_20180221_01_T2"
+		landsat.download_scenes(scenes_list=[scene],  bands=[4, "BQA"])
 
 
 * TODO
