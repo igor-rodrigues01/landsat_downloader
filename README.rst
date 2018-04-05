@@ -24,9 +24,6 @@ Features:
 --------
 
 * Find scenes;
-* Download scenes;
-
-## Finding scenes:
 
 ```python
 from datetime import datetime, timedelta
@@ -43,7 +40,8 @@ scenes = LandsatFinder.search_scenes_metadata(
 	end_date=today)
 ```
 
-## Downloading scenes:
+* Download scenes;
+
 ```python
 from datetime import datetime, timedelta
 
