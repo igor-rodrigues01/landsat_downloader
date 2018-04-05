@@ -1,6 +1,6 @@
----
+============
 landsat_downloader
----
+============
 
 .. image:: https://img.shields.io/pypi/v/landsat_downloader.svg
         :target: https://pypi.python.org/pypi/landsat_downloader
