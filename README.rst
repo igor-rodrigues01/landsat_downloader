@@ -47,7 +47,7 @@ Features:
 		scene = "LC82240692018037LGN00"
 		landsat.download_scenes(scenes_list=[scene], bands=[4, "BQA"])
 
-or
+    or
 
     .. code-block:: python
     
