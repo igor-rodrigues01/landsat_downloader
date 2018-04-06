@@ -49,8 +49,7 @@ class SceneInfo:
         return datetime.strptime(julian_date, '%Y%j').date()
 
     def make_rt_product_id(self, product_id=False):
-        """ 
-        Creates a file with product_id in Real Time category name
+        """Creates a file with product_id in Real Time category name
         E.g.: LC08_L1GT_224069_20180206_20180301_01_T1 ->
               LC08_L1GT_224069_20180206_20180206_01_RT
         """
@@ -101,4 +100,4 @@ class SceneInfo:
         ])
 
     def __repr__(self):
-        return "Scene %s" % self.product_id
+        return "Scene {}".format(self.product_id)

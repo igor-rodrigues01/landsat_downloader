@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-import os 
+import os
 import requests
 import logging
 
 from homura import download as fetch
 
-from .exceptions import InvalidBandError, RemoteFileDoesntExist, DownloaderErrors
+from .exceptions import (
+    InvalidBandError, RemoteFileDoesntExist, DownloaderErrors
+)
 from .scene_info import SceneInfo
 
 DOWNLOAD_DIR = os.path.join(os.path.expanduser('~'), 'landsat')
@@ -73,7 +75,7 @@ class DownloaderBase:
         """Gets the filesize of a remote file """
         headers = requests.head(url).headers
         return int(headers['content-length'])
-    
+
     def _get_valid_bands(self):
         bands = ["B{}".format(i) for i in range(1, 12)]
         bands.append('BQA')
@@ -82,7 +84,6 @@ class DownloaderBase:
     def validate_bands(self, bands):
         """Validate bands parameter."""
         valid_bands = self._get_valid_bands()
-        
         if not isinstance(bands, list):
             logger.error('Parameter bands must be a "list"')
             raise TypeError('Parameter bands must be a "list"')
@@ -110,8 +111,9 @@ class AWSDownloaderBase(DownloaderBase):
 
     def check_remote_file(self):
         if not self.remote_file_exists():
-            raise RemoteFileDoesntExist(
-                '{} is not available on AWS Storage'.format(self.considered_id))
+            msg = '{} is not available on AWS Storage'.format(
+                self.considered_id)
+            raise RemoteFileDoesntExist(msg)
 
     def remote_file_exists(self):
         """Verify whether the file (scene) exists on AWS Storage."""
@@ -169,22 +171,11 @@ class AWSDownloaderCollection1RT(AWSDownloaderBase):
         return "AWS - RT: Scene {}".format(self.considered_id)
 
 
-# class AWSDownloaderPreCollection(AWSDownloaderBase):
-#     """docstring for AWSDownloaderCollection1."""
-
-#     def __init__(self, scene_info):
-#         url = 'http://landsat-pds.s3.amazonaws.com/L8/'
-#         super().__init__(scene_info, scene_info.scene_id, url)
-
-#     def __repr__(self):
-#         return "AWS - Pre-collection: Scene {}".format(self.considered_id)
-
-
 class Downloader:
     """
-    Class that calls 
+    Class that calls
         AWSDownloaderCollection1
-        GoogleDownloader 
+        GoogleDownloader
     to download Landsat imagery.
     """
 
@@ -199,13 +190,7 @@ class Downloader:
 
         t1_available = True
         rt_available = True
-        # pre_available = True
 
-        # try:
-        #     self.downloader = AWSDownloaderPreCollection(self.scene)
-        # except Exception as exc:
-        #     pre_available = False
-        #     pass
         try:
             self.downloader = AWSDownloaderCollection1RT(self.scene_info)
         except Exception as exc:
@@ -217,12 +202,13 @@ class Downloader:
             t1_available = False
             pass
 
-        print('\nT1/T2\t\tscene is available on AWS:\t{}\t({})'.format(t1_available,
-                                                                       self.scene_info.product_id))
-        print('Real-Time\tscene is available on AWS:\t{}\t({})'.format(rt_available,
-                                                                       self.scene_info.make_rt_product_id()))
-        # print('Pre-collection\tscene is available on AWS:\t{}\t({})'.format(
-        #     pre_available, self.scene_info.info.get('scene_id')))
+        t1_t2_msg = 'scene is available on AWS:\t{}\t({})'.format(
+            t1_available, self.scene_info.product_id)
+        rt_msg = 'scene is available on AWS:\t{}\t({})'.format(
+            rt_available, self.scene_info.make_rt_product_id())
+
+        print('\nT1/T2\t\t{}'.format(t1_t2_msg))
+        print('Real-Time\t{}'.format(rt_msg))
 
         if self.downloader is None:
             raise DownloaderErrors([])

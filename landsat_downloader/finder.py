@@ -40,28 +40,31 @@ class LandsatFinder:
                     else:
                         try:
                             metadata_list[i][k] = float(v)
-                        except:
-                            pass
+                        except Exception as exc:
+                            metadata_list[i][k] = str(v)
         except Exception as exc:
             metadata_list = []
 
         return metadata_list
 
     @staticmethod
-    def search_scenes_metadata(path_row_list, start_date, end_date, sensor="LANDSAT_8_C1"):
+    def search_scenes_metadata(
+        path_row_list, start_date, end_date, sensor="LANDSAT_8_C1"
+    ):
         """
         Search scenes from EarthExplorer for date range and path row list
         returns a list of scenes with metadata
         params:
-            start_date: initial date 
-            end_date: end date 
-            path_row_list: must be a list of path and row. E.g.: [(50,50),(200,200)]
+            start_date: initial date
+            end_date: end date
+            path_row_list: must be a list of path and row.
+                E.g.: [(50,50),(200,200)]
             sensor: EarthExplorer sensor mode name. default: Landsat_8_C1
         """
 
         if type(path_row_list) != list:
             raise ValueError(
-                "[Error on Search Scenes Metadata] " + \
+                "[Error on Search Scenes Metadata] " +
                 "Expected value is: [(path, row), (path, row)...]")
 
         metadata_dict_list = []
@@ -89,9 +92,10 @@ class LandsatFinder:
         Search scenes from EarthExplorer for date range and path row list
         returns a list of scenes with metadata
         params:
-            start_date: initial date 
-            end_date: end date 
-            path_row_list: must be a list of path and row. E.g.: [(50,50),(200,200)]
+            start_date: initial date
+            end_date: end date
+            path_row_list: must be a list of path and row.
+                E.g.: [(50,50),(200,200)]
             sensor: EarthExplorer sensor mode name. default: Landsat_8_C1
         """
         scene_list = LandsatFinder.search_scenes_metadata(

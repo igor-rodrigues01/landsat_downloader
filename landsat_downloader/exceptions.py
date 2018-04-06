@@ -6,6 +6,7 @@ class DownloaderErrors(Exception):
         super(DownloaderErrors, self).__init__(*args, **kwargs)
         self.errors = errors
 
+
 class WrongSceneNameError(Exception):
     pass
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-import os
 
 from .downloader_base import Downloader
 from .scene_info import SceneInfo
@@ -40,7 +39,10 @@ class LandsatDownloader:
         return _bands
 
     @staticmethod
-    def download_scenes(bands, scene_id_list=False, product_id_list=False, download_dir=None, metadata=True):
+    def download_scenes(
+        bands, scene_id_list=False,
+        product_id_list=False, download_dir=None, metadata=True
+    ):
 
         downloaded = []
 
@@ -64,8 +66,8 @@ class LandsatDownloader:
                 scene = SceneInfo(product_id=product_id)
                 scene_downloader = Downloader(scene)
                 imgs = scene_downloader.download(bands=bands,
-                                          download_dir=download_dir,
-                                          metadata=metadata)
+                                                 download_dir=download_dir,
+                                                 metadata=metadata)
                 downloaded.extend(imgs)
 
         if scene_id_list:
@@ -74,8 +76,8 @@ class LandsatDownloader:
                 scene = SceneInfo(scene_id=scene_id)
                 scene_downloader = Downloader(scene)
                 imgs = scene_downloader.download(bands=bands,
-                                          download_dir=download_dir,
-                                          metadata=metadata)
+                                                 download_dir=download_dir,
+                                                 metadata=metadata)
                 downloaded.extend(imgs)
 
         return downloaded
