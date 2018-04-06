@@ -71,3 +71,40 @@ def test_command_line_interface():
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output
+
+
+def test_download_scene_without_scene_product():
+    try:
+        imgs = LandsatDownloader.download_scenes(
+            bands=11
+        )
+    except ValueError as exc:
+        assert(isinstance(exc, ValueError))
+
+
+def test_download_scene_with_scene_product():
+    try:
+        imgs = LandsatDownloader.download_scenes(
+            bands=['BQA'],
+            product_id_list=['LC08_L1GT_224068_20180310_20180320_01_T2'],
+            scene_id_list=['LC82240692018037LGN00']
+        )
+    except ValueError as exc:
+        assert(isinstance(exc, ValueError))
+
+
+def test_download_scene_without_scene():
+    imgs = LandsatDownloader.download_scenes(
+        bands=['BQA'], product_id_list=['LC08_L1GT_224068_20180310_20180320_01_T2']
+    )
+    assert(imgs)
+    os.remove(imgs[0]['path'])
+
+
+def test_download_scene_without_product():
+    imgs = LandsatDownloader.download_scenes(
+        bands=['BQA'],
+        scene_id_list=['LC82240692018037LGN00']
+    )
+    assert(imgs)
+    os.remove(imgs[0]['path'])

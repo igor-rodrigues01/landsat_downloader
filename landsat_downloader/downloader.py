@@ -13,6 +13,21 @@ class LandsatDownloader:
     """docstring for LandsatDownloader"""
 
     @classmethod
+    def _validate_scene_product(self, scene_id_list, product_id_list):
+        scene_id_list_exists = False
+        product_id_list_exists = False
+
+        if scene_id_list and type(scene_id_list) == list:
+            scene_id_list_exists = True
+
+        elif product_id_list and type(product_id_list) == list:
+            product_id_list_exists = True
+
+        if not scene_id_list_exists ^ product_id_list_exists:
+            return False
+        return True
+
+    @classmethod
     def _create_bands_names(self, bands):
         if type(bands) != list:
             raise ValueError(
@@ -29,13 +44,14 @@ class LandsatDownloader:
 
         downloaded = []
 
-        if scene_id_list and type(scene_id_list) != list:
-            raise ValueError("[Error on Download Scenes\n\
-                Expected value is: [scene_id, scene_id...]")
+        scene_id_list_product_id_list_validated = \
+            LandsatDownloader._validate_scene_product(
+                scene_id_list, product_id_list
+            )
 
-        if product_id_list and type(product_id_list) != list:
-            raise ValueError("[Error on Download Scenes\n\
-                Expected value is: [scene_id, scene_id...]")
+        if not scene_id_list_product_id_list_validated:
+            raise ValueError("[Error on Download Scenes]\n\
+                    Expected value is: [scene_id, scene_id...]")
 
         try:
             bands = LandsatDownloader._create_bands_names(bands)
@@ -44,8 +60,8 @@ class LandsatDownloader:
 
         if product_id_list:
 
-            for scene_id in scene_id_list:
-                scene = SceneInfo(product_id=scene_id)
+            for product_id in product_id_list:
+                scene = SceneInfo(product_id=product_id)
                 scene_downloader = Downloader(scene)
                 imgs = scene_downloader.download(bands=bands,
                                           download_dir=download_dir,
