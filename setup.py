@@ -15,6 +15,7 @@ requirements = [
     'Click>=6.0', 
     'homura==0.1.5',
     'xmltodict==0.11.0',
+    'requests==2.18.4'
     ]
 
 setup_requirements = ['pytest-runner', ]
