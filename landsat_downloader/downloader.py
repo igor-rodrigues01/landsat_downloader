@@ -63,21 +63,49 @@ class LandsatDownloader:
         if product_id_list:
 
             for product_id in product_id_list:
-                scene = SceneInfo(product_id=product_id)
-                scene_downloader = Downloader(scene)
-                imgs = scene_downloader.download(bands=bands,
-                                                 download_dir=download_dir,
-                                                 metadata=metadata)
+                imgs = LandsatDownloader.download_scene(
+                    product_id=product_id,
+                    bands=bands,
+                    download_dir=download_dir,
+                    metadata=metadata
+                    )
                 downloaded.extend(imgs)
-
         if scene_id_list:
 
             for scene_id in scene_id_list:
-                scene = SceneInfo(scene_id=scene_id)
-                scene_downloader = Downloader(scene)
-                imgs = scene_downloader.download(bands=bands,
-                                                 download_dir=download_dir,
-                                                 metadata=metadata)
+                imgs = LandsatDownloader.download_scene(
+                    scene_id=scene_id,
+                    bands=bands,
+                    download_dir=download_dir,
+                    metadata=metadata
+                    )
                 downloaded.extend(imgs)
 
         return downloaded
+
+
+    @staticmethod
+    def download_scene(
+        bands, scene_id=False, product_id=False,
+        download_dir=False, metadata=True
+    ):
+
+        if scene_id: 
+            scene = SceneInfo(scene_id=scene_id)
+            scene_downloader = Downloader(scene)
+            imgs = scene_downloader.download(
+                bands=bands,
+                download_dir=download_dir,
+                metadata=metadata
+                )
+            return imgs
+
+        if product_id:
+            scene = SceneInfo(product_id=product_id)
+            scene_downloader = Downloader(scene)
+            imgs = scene_downloader.download(
+                bands=bands,
+                download_dir=download_dir,
+                metadata=metadata
+                )
+            return imgs
