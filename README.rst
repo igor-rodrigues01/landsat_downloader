@@ -61,6 +61,9 @@ Features:
 
 * TODO
 
+- Create CLI;
+- Add Landsat Pre-Collection data;
+
 Credits
 -------
 
