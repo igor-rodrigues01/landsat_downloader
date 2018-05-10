@@ -47,22 +47,9 @@ Features:
 		scene = "LC82240692018037LGN00"
 		landsat.download_scenes(scenes_list=[scene], bands=[4, "BQA"])
 
-    or
-
-    .. code-block:: python
-    
-		from datetime import datetime, timedelta
-
-		from landsat_downloader.downloader import *
-
-		scene = "LC08_L1GT_224069_20180206_20180221_01_T2"
-		landsat.download_scenes(scenes_list=[scene],  bands=[4, "BQA"])
-
-
 * TODO
 
 - Create CLI;
-- Add Landsat Pre-Collection data;
 
 Credits
 -------
