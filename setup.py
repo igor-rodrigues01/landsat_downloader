@@ -12,11 +12,11 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'Click>=6.0', 
+    'Click>=6.0',
     'homura==0.1.5',
     'xmltodict==0.11.0',
     'requests==2.18.4'
-    ]
+]
 
 setup_requirements = ['pytest-runner', ]
 
@@ -30,8 +30,6 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
