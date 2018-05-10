@@ -103,8 +103,8 @@ class AWSDownloaderBase(DownloaderBase):
         self.considered_id = considered_id
         self.base_url = os.path.join(
             url,
-            '{0:03d}'.format(scene_info.info.get('path')),
-            '{0:03d}'.format(scene_info.info.get('row')),
+            '{0:03d}'.format(scene_info.info.path),
+            '{0:03d}'.format(scene_info.info.row),
             considered_id
         )
         self.check_remote_file()
@@ -124,7 +124,7 @@ class AWSDownloaderBase(DownloaderBase):
         """Download each specified band and metadata."""
         super(AWSDownloaderBase, self).validate_bands(bands)
 
-        if download_dir is None:
+        if not download_dir:
             download_dir = DOWNLOAD_DIR
 
         dest_dir = self.check_create_folder(
@@ -149,7 +149,7 @@ class AWSDownloaderBase(DownloaderBase):
         return downloaded
 
 
-class AWSDownloaderCollection1T1(AWSDownloaderBase):
+class AWSDownloaderCollection1Tiers(AWSDownloaderBase):
     """docstring for AWSDownloaderCollection1."""
 
     def __init__(self, scene_info):
@@ -171,6 +171,17 @@ class AWSDownloaderCollection1RT(AWSDownloaderBase):
         return "AWS - RT: Scene {}".format(self.considered_id)
 
 
+class AWSDownloaderPreCollection(AWSDownloaderBase):
+    """docstring for AWSDownloaderCollection1."""
+
+    def __init__(self, scene_info):
+        url = 'http://landsat-pds.s3.amazonaws.com/L8/'
+        super().__init__(scene_info, scene_info.scene_id, url)
+
+    def __repr__(self):
+        return "AWS - Pre-Collection: Scene {}".format(self.considered_id)
+
+
 class Downloader:
     """
     Class that calls
@@ -184,34 +195,67 @@ class Downloader:
         self.scene_info = scene_info
 
         print('\nScene-ID:\t' + str(self.scene_info.product_id))
-        print('Path:\t\t' + str(self.scene_info.info.get('path')))
-        print('Row:\t\t' + str(self.scene_info.info.get('row')))
-        print('Acq. date:\t' + str(self.scene_info.info.get('acq_date')))
+        print('Path:\t\t' + str(self.scene_info.info.path))
+        print('Row:\t\t' + str(self.scene_info.info.row))
+        print('Acq. date:\t' + str(self.scene_info.info.acq_date))
 
-        t1_available = True
-        rt_available = True
+        self.t1_available = True
+        self.rt_available = True
+        self.pre_available = True
 
+        try:
+            self.downloader = AWSDownloaderCollection1Tiers(self.scene_info)
+        except Exception as exc:
+            self.t1_available = False
+            pass
         try:
             self.downloader = AWSDownloaderCollection1RT(self.scene_info)
         except Exception as exc:
-            rt_available = False
+            self.rt_available = False
             pass
         try:
-            self.downloader = AWSDownloaderCollection1T1(self.scene_info)
+            self.downloader = self.try_pre_collections()
         except Exception as exc:
-            t1_available = False
+            self.pre_available = False
             pass
 
         t1_t2_msg = 'scene is available on AWS:\t{}\t({})'.format(
-            t1_available, self.scene_info.product_id)
+            self.t1_available, self.scene_info.product_id)
         rt_msg = 'scene is available on AWS:\t{}\t({})'.format(
-            rt_available, self.scene_info.make_rt_product_id())
+            self.rt_available, self.scene_info.make_rt_product_id())
+        pre_msg = 'scene is available on AWS:\t{}\t({})'.format(
+            self.pre_available, self.scene_info.scene_id)
 
         print('\nT1/T2\t\t{}'.format(t1_t2_msg))
         print('Real-Time\t{}'.format(rt_msg))
+        print('Pre Collection\t{}'.format(pre_msg))
 
         if self.downloader is None:
             raise DownloaderErrors([])
+
+    def __replace_version_name(self, scene_id, idx, from_str, to_str='00'):
+        """Returns a replace of pre collection version"""
+        return scene_id[:idx] + scene_id[idx:].replace(from_str, to_str)
+
+    def try_pre_collections(self):
+        """Try pre collection info for each pre collection version"""
+        scene_id = self.scene_info.scene_id
+
+        try:
+            downloader = AWSDownloaderPreCollection(self.scene_info)
+        except RemoteFileDoesntExist as exc:
+            try:
+                if self.scene_info.info.version:
+                    scene_id = self.__replace_version_name(
+                        scene_id=scene_id, idx=19,
+                        from_str=self.scene_info.info.version)
+                    self.scene_info = SceneInfo(scene_id=scene_id)
+                downloader = AWSDownloaderPreCollection(self.scene_info)
+
+            except RemoteFileDoesntExist as e:
+                raise e
+
+        return downloader
 
     def download(self, *args, **kwargs):
         print("\nUsing {}".format(self.downloader))

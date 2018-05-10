@@ -12,19 +12,11 @@ class LandsatDownloader:
     """docstring for LandsatDownloader"""
 
     @classmethod
-    def _validate_scene_product(self, scene_id_list, product_id_list):
-        scene_id_list_exists = False
-        product_id_list_exists = False
-
+    def _validate_scene_id(self, scene_id_list):
         if scene_id_list and type(scene_id_list) == list:
-            scene_id_list_exists = True
+            return True
 
-        elif product_id_list and type(product_id_list) == list:
-            product_id_list_exists = True
-
-        if not scene_id_list_exists ^ product_id_list_exists:
-            return False
-        return True
+        return False
 
     @classmethod
     def _create_bands_names(self, bands):
@@ -41,17 +33,16 @@ class LandsatDownloader:
     @staticmethod
     def download_scenes(
         bands, scene_id_list=False,
-        product_id_list=False, download_dir=None, metadata=True
+        download_dir=None, metadata=True
     ):
 
         downloaded = []
 
-        scene_id_list_product_id_list_validated = \
-            LandsatDownloader._validate_scene_product(
-                scene_id_list, product_id_list
-            )
+        scene_list_valid = LandsatDownloader._validate_scene_id(
+            scene_id_list
+        )
 
-        if not scene_id_list_product_id_list_validated:
+        if not scene_list_valid:
             raise ValueError("[Error on Download Scenes]\n\
                     Expected value is: [scene_id, scene_id...]")
 
@@ -60,52 +51,29 @@ class LandsatDownloader:
         except Exception as exc:
             raise(exc)
 
-        if product_id_list:
-
-            for product_id in product_id_list:
-                imgs = LandsatDownloader.download_scene(
-                    product_id=product_id,
-                    bands=bands,
-                    download_dir=download_dir,
-                    metadata=metadata
-                    )
-                downloaded.extend(imgs)
         if scene_id_list:
-
             for scene_id in scene_id_list:
                 imgs = LandsatDownloader.download_scene(
                     scene_id=scene_id,
                     bands=bands,
                     download_dir=download_dir,
                     metadata=metadata
-                    )
+                )
                 downloaded.extend(imgs)
-
         return downloaded
-
 
     @staticmethod
     def download_scene(
         bands, scene_id=False, product_id=False,
-        download_dir=False, metadata=True
+        download_dir=None, metadata=True
     ):
 
-        if scene_id: 
+        if scene_id:
             scene = SceneInfo(scene_id=scene_id)
             scene_downloader = Downloader(scene)
             imgs = scene_downloader.download(
                 bands=bands,
                 download_dir=download_dir,
                 metadata=metadata
-                )
-            return imgs
-
-        if product_id:
-            scene = SceneInfo(product_id=product_id)
-            scene_downloader = Downloader(scene)
-            imgs = scene_downloader.download(
-                bands=bands,
-                download_dir=download_dir,
-                metadata=metadata
-                )
+            )
             return imgs
