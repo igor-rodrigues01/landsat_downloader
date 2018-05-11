@@ -202,7 +202,12 @@ class Downloader:
         self.t1_available = True
         self.rt_available = True
         self.pre_available = True
-
+        
+        try:
+            self.downloader = self.try_pre_collections()
+        except Exception as exc:
+            self.pre_available = False
+            pass
         try:
             self.downloader = AWSDownloaderCollection1Tiers(self.scene_info)
         except Exception as exc:
@@ -213,11 +218,7 @@ class Downloader:
         except Exception as exc:
             self.rt_available = False
             pass
-        try:
-            self.downloader = self.try_pre_collections()
-        except Exception as exc:
-            self.pre_available = False
-            pass
+
 
         t1_t2_msg = 'scene is available on AWS:\t{}\t({})'.format(
             self.t1_available, self.scene_info.product_id)
