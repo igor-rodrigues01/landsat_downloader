@@ -41,11 +41,12 @@ Features:
 	.. code-block:: python
     
 		from datetime import datetime, timedelta
-
 		from landsat_downloader.downloader import *
-
-		scene = "LC82240692018037LGN00"
+		
+		scene_id = "LC80020652018130LGN00"
+		product_id = "LC08_L1TP_002065_20180510_20180517_01_T1"
 		landsat.download_scenes(scenes_list=[scene], bands=[4, "BQA"])
+		LandsatDownloader.download_scene(bands=["B6"], scene_id=scene_id, product_id=product_id)
 
 * TODO
 
