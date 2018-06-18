@@ -43,8 +43,8 @@ def test_bands_exception():
 
 
 def test_download_bands():
-    imgs = LandsatDownloader.download_scenes(
-        bands=["BQA"], scene_id_list=[SCENE_ID_22469])
+    imgs = LandsatDownloader.download_scene(
+        bands=["BQA"], scene_id=SCENE_ID_22469, product_id=PRODUCT_ID_22469_T2)
     assert(len(imgs) == 2)
     assert(imgs[0]['type'] == 'BQA')
     assert(imgs[0]['name'] ==
@@ -58,9 +58,10 @@ def test_download_bands():
 
 
 def test_download_without_metadata():
-    imgs = LandsatDownloader.download_scenes(
+    imgs = LandsatDownloader.download_scene(
         bands=["BQA"],
-        scene_id_list=[SCENE_ID_22469],
+        scene_id=SCENE_ID_22469,
+        product_id=PRODUCT_ID_22469_T2,
         metadata=False
     )
     assert(len(imgs) == 1)
@@ -68,8 +69,11 @@ def test_download_without_metadata():
     assert(imgs[0]['name'] == '{}_BQA.TIF'.format(PRODUCT_ID_22469_RT))
 
     # Test if files exists
-    imgs = LandsatDownloader.download_scenes(
-        bands=["BQA"], scene_id_list=[SCENE_ID_22469], metadata=False)
+    imgs = LandsatDownloader.download_scene(
+        bands=["BQA"], 
+        scene_id=SCENE_ID_22469,
+        product_id=PRODUCT_ID_22469_T2,
+        metadata=False)
     assert(len(imgs) == 1)
     assert(imgs[0]['type'] == 'BQA')
     assert(imgs[0]['name'] == '{}_BQA.TIF'.format(PRODUCT_ID_22469_RT))
@@ -78,25 +82,27 @@ def test_download_without_metadata():
 
 def test_download_scene_without_scene_product():
     with pytest.raises(ValueError):
-        LandsatDownloader.download_scenes(bands=11)
+        LandsatDownloader.download_scene(bands=11)
 
 
 def test_download_scene_with_scene_product():
     with pytest.raises(ValueError):
-        LandsatDownloader.download_scenes(
+        LandsatDownloader.download_scene(
             bands=['BQA'],
-            scene_id_list=SCENE_ID_22469
+            scene_id=SCENE_ID_22469
         )
 
 
-def test_download_scenes_with_null_list():
+def test_download_scene_with_null_list():
     with pytest.raises(ValueError):
-        LandsatDownloader.download_scenes(bands=[])
+        LandsatDownloader.download_scene(bands=[])
 
 
-def test_download_scenes_with_scen_id_list():
-    imgs = LandsatDownloader.download_scenes(
-        bands=['BQA'], scene_id_list=[SCENE_ID_22469])
+def test_download_scene_with_scen_id_list():
+    imgs = LandsatDownloader.download_scene(
+        bands=['BQA'], 
+        scene_id=SCENE_ID_22469,
+        product_id=PRODUCT_ID_22469_RT)
     assert("{}_BQA.TIF".format(PRODUCT_ID_22469_RT)
            in [i['name'] for i in imgs])
     assert('BQA' in [i['type'] for i in imgs])
@@ -107,7 +113,9 @@ def test_download_scenes_with_scen_id_list():
 
 def test_download_scene_without_product_T2():
     imgs = LandsatDownloader.download_scene(
-        bands=['BQA'], scene_id=SCENE_ID_22468
+        bands=['BQA'], 
+        scene_id=SCENE_ID_22468,
+        product_id=PRODUCT_ID_22468_T2
     )
     product_id = "{}_BQA.TIF".format(PRODUCT_ID_22468_RT)
     assert(product_id in [i['name'] for i in imgs])
@@ -119,7 +127,9 @@ def test_download_scene_without_product_T2():
 
 def test_download_scene_without_product_T1():
     imgs = LandsatDownloader.download_scene(
-        bands=['BQA'], scene_id=SCENE_ID_22469
+        bands=['BQA'], 
+        scene_id=SCENE_ID_22469, 
+        product_id=PRODUCT_ID_22469_T2
     )
     assert("{}_BQA.TIF".format(PRODUCT_ID_22469_RT)
            in [i['name'] for i in imgs])

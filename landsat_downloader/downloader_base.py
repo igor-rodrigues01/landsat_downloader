@@ -103,8 +103,8 @@ class AWSDownloaderBase(DownloaderBase):
         self.considered_id = considered_id
         self.base_url = os.path.join(
             url,
-            '{0:03d}'.format(scene_info.info.path),
-            '{0:03d}'.format(scene_info.info.row),
+            '{0:03d}'.format(scene_info.path),
+            '{0:03d}'.format(scene_info.row),
             considered_id
         )
         self.check_remote_file()
@@ -118,6 +118,7 @@ class AWSDownloaderBase(DownloaderBase):
     def remote_file_exists(self):
         """Verify whether the file (scene) exists on AWS Storage."""
         url = os.path.join(self.base_url, 'index.html')
+        print(url)
         return super(AWSDownloaderBase, self).remote_file_exists(url)
 
     def download(self, bands=[], download_dir=None, metadata=True):
@@ -153,8 +154,8 @@ class AWSDownloaderCollection1Tiers(AWSDownloaderBase):
     """docstring for AWSDownloaderCollection1."""
 
     def __init__(self, scene_info):
-        url = 'http://landsat-pds.s3.amazonaws.com/c1/L8/'
-        super().__init__(scene_info, scene_info.product_id, url)
+        url = 'https://s3-us-west-2.amazonaws.com/landsat-pds/c1/L8/'
+        super().__init__(scene_info.product_info, scene_info.product_id, url)
 
     def __repr__(self):
         return "AWS - T1/T2: Scene {}".format(self.considered_id)
@@ -164,8 +165,8 @@ class AWSDownloaderCollection1RT(AWSDownloaderBase):
     """docstring for AWSDownloaderCollection1."""
 
     def __init__(self, scene_info):
-        url = 'http://landsat-pds.s3.amazonaws.com/c1/L8/'
-        super().__init__(scene_info, scene_info.make_rt_product_id(), url)
+        url = 'https://s3-us-west-2.amazonaws.com/landsat-pds/c1/L8/'
+        super().__init__(scene_info.product_info, scene_info.make_rt_product_id(), url)
 
     def __repr__(self):
         return "AWS - RT: Scene {}".format(self.considered_id)
@@ -175,8 +176,9 @@ class AWSDownloaderPreCollection(AWSDownloaderBase):
     """docstring for AWSDownloaderCollection1."""
 
     def __init__(self, scene_info):
-        url = 'http://landsat-pds.s3.amazonaws.com/L8/'
-        super().__init__(scene_info, scene_info.scene_id, url)
+        url = 'https://s3-us-west-2.amazonaws.com/landsat-pds/L8/'
+        # url = 'http://landsat-pds.s3.amazonaws.com/L8/'
+        super().__init__(scene_info.id_info, scene_info.scene_id, url)
 
     def __repr__(self):
         return "AWS - Pre-Collection: Scene {}".format(self.considered_id)
@@ -194,10 +196,12 @@ class Downloader:
         self.downloader = None
         self.scene_info = scene_info
 
-        print('\nScene-ID:\t' + str(self.scene_info.product_id))
-        print('Path:\t\t' + str(self.scene_info.info.path))
-        print('Row:\t\t' + str(self.scene_info.info.row))
-        print('Acq. date:\t' + str(self.scene_info.info.acq_date))
+
+        print('\nScene-ID:\t' + str(self.scene_info.scene_id))
+        print('Product-ID:\t' + str(self.scene_info.product_id))
+        print('Path:\t\t' + str(self.scene_info.id_info.path))
+        print('Row:\t\t' + str(self.scene_info.id_info.row))
+        print('Acq. date:\t' + str(self.scene_info.id_info.acq_date))
 
         self.t1_available = True
         self.rt_available = True
@@ -246,14 +250,21 @@ class Downloader:
             downloader = AWSDownloaderPreCollection(self.scene_info)
         except RemoteFileDoesntExist as exc:
             try:
-                if self.scene_info.info.version:
+                if self.scene_info.id_info.version:
+                    
                     scene_id = self.__replace_version_name(
                         scene_id=scene_id, idx=19,
-                        from_str=self.scene_info.info.version)
-                    self.scene_info = SceneInfo(scene_id=scene_id)
+                        from_str=self.scene_info.id_info.version)
+                    
+                    self.scene_info = SceneInfo(
+                        scene_id=scene_id, 
+                        product_id=self.scene_info.product_id)
+                
                 downloader = AWSDownloaderPreCollection(self.scene_info)
 
             except RemoteFileDoesntExist as e:
+                raise e
+            except Exception as e:
                 raise e
 
         return downloader
